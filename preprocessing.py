@@ -44,3 +44,5 @@ labels = to_categorical(labels, num_classes=2)
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size = 0.2, random_state = 42)
 
+print(X_train)
+print(y_test)
