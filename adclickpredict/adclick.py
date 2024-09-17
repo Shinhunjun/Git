@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-
 import os 
 
 df = pd.read_csv('/Users/hunjunsin/Desktop/python/Kaggle/adclickpredict/ad_click_dataset.csv')
@@ -64,7 +63,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.1, rando
 for name, model in models.items():
     print(name)
     model.fit(X_train, y_train)
-    y_pred = model.predcit(X_test)
+    y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
     print("Classification Report:")
@@ -73,3 +72,41 @@ for name, model in models.items():
     print(confusion_matrix(y_test, y_pred))
     print("-"* 20)
     
+from sklearn.model_selection import GridSearchCV
+
+param_grids = {
+    'Decision Tree': {
+       'max_depth': [3, 5, 10, 15],
+       'min_samples_split': [2, 5, 10],
+       'min_samples_leaf': [1, 5, 10]
+    },
+    'XGBoost': {
+       'max_depth': [3, 5, 10],
+        'learning_rate': [0.1, 0.5, 1],
+        'n_estimators': [50, 100, 200]
+    },
+    'Random Forest': {
+        'n_estimators': [50, 100, 200],
+       'max_depth': [3, 5, 10],
+       'min_samples_split': [2, 5, 10]
+    }
+}
+
+for name, model in models.items():
+    if name not in param_grids:
+        continue
+    
+    grid_search = GridSearchCV(model, param_grids[name], cv=5, scoring='accuracy', verbose =1)
+    grid_search.fit(X_train, y_train)
+    y_pred = grid_search.predict(X_test)
+    
+    print(f"Best Parameters for : {name}: {grid_search.best_params_}")
+    print(f"Best score for : {name}: {grid_search.best_score_}")
+    
+    accuracy = accuracy_score(y_test, y_pred)
+    print("Accuracy:", accuracy)
+    print("Classification_Report: ")
+    print(classification_report(y_test, y_pred))
+    print("Confusion Matrix: ")
+    print(confusion_matrix(y_test, y_pred))
+    print("*"*30)
